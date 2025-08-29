@@ -3,6 +3,7 @@ from typing import Dict, Any, List, Tuple
 from .utils.logging import ensure_dir, append_jsonl, save_json, new_run_dir
 from .verifiers.numeric import verify_numeric
 from .verifiers.json_schema import verify_json
+from .verifiers.python_code import verify_python
 
 def load_tasks(path: str) -> List[Dict[str, Any]]:
     tasks = []
@@ -20,6 +21,8 @@ def normalize_answer(task: Dict[str, Any], text: str) -> Tuple[bool, float, Dict
         return verify_numeric(text, float(task['answer']), tol=float(task.get('tol', 1e-6)))
     elif ttype == 'json':
         return verify_json(text, task['answer'], required_keys=task.get('required_keys'))
+    elif ttype == 'python':
+        return verify_python(text, task['fn_name'], task['tests'])
     else:
         ok = (text.strip() == str(task['answer']).strip())
         return ok, (1.0 if ok else 0.0), {}
@@ -39,6 +42,11 @@ def build_prompt(task: Dict[str, Any]) -> str:
             f"Schema (keys and types): {schema_hint}\n\n"
             f"Text: {task['prompt']}\n\nJSON: "
         )
+    elif ttype == 'python':
+        return (
+            "Write the requested Python function and reply with only the code.\n\n"
+            f"Task: {task['prompt']}\n"
+        )
     else:
         return task['prompt']
 
@@ -51,7 +59,7 @@ def run_single(model_generate, model_name: str, task: Dict[str, Any], temperatur
 def run_best_of_n(model_generate, model_name: str, task: Dict[str, Any], temperature: float, n: int) -> Dict[str, Any]:
     prompt = build_prompt(task)
     cands = []
-    for _ in range(n):
+    for i in range(n):
         text = model_generate(model_name, prompt, temperature=temperature)
         ok, score, meta = normalize_answer(task, text)
         if task.get('type') == 'numeric':
@@ -59,6 +67,9 @@ def run_best_of_n(model_generate, model_name: str, task: Dict[str, Any], tempera
         else:
             dist = 1.0 - float(score)
         cands.append({'text': text, 'ok': ok, 'score': score, 'dist': dist, 'meta': meta})
+        # Add a small delay between requests to prevent overwhelming Ollama
+        if i < n - 1:  # Don't delay after the last request
+            time.sleep(0.1)
     cands.sort(key=lambda x: (-x['score'], x['dist']))
     best = cands[0]
     best['all_candidates'] = cands

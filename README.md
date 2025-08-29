@@ -21,7 +21,7 @@ ollama pull qwen2.5:1.5b-instruct
 ```bash
 python3 -m neurometric_benchmark.main run \
   --task tasks/math/basic.jsonl \
-  --model ollama/llama3.2:1b-instruct \
+  --model ollama/qwen2.5:1.5b-instruct \
   --strategy best_of_n --n 5 --temperature 0.8
 ```
 
@@ -34,18 +34,20 @@ python3 -m neurometric_benchmark.main report --run-dir runs/<your_run_dir>
 Makefile shortcuts are available:
 
 ```bash
-make pull-llama         # pull llama3.2:1b-instruct
 make pull-qwen          # pull qwen2.5:1.5b-instruct
-make run-math-llama     # run math best‑of‑5 with Llama
 make run-math-qwen      # run math best‑of‑5 with Qwen
 make report-latest      # render a report for the most recent run
 ```
 
-## What’s Included
+## What's Included
 
 - Tasks:
   - `tasks/math/basic.jsonl` — numeric problems with programmatic verifier.
+  - `tasks/math/gsm8k.jsonl` — grade-school math word problems.
+  - `tasks/logic/basic.jsonl` — logic puzzles with exact answers.
+  - `tasks/code/basic.jsonl` — tiny Python functions checked by unit tests.
   - `tasks/extraction/structured.jsonl` — JSON extraction with schema validation.
+  - `tasks/extraction/messy.jsonl` — noisy real-world text (invoices, resumes, etc.).
 - Strategies:
   - `single` — single‑shot baseline.
   - `best_of_n` — sample N candidates and choose with verifier (score + tie‑break).
@@ -84,8 +86,8 @@ python3 -m neurometric_benchmark.main report --run-dir runs/run_20240101_123456
 ## Notes
 
 - Pure standard library; no external dependencies required for core features.
-- Programmatic verifiers mean you don’t need an LLM‑as‑judge locally.
-- To try a remote “big model” baseline, fill `neurometric_benchmark/models/openai_client.py` and set `OPENAI_API_KEY`.
+- Programmatic verifiers mean you don't need an LLM‑as‑judge locally.
+- To try a remote "big model" baseline, fill `neurometric_benchmark/models/openai_client.py` and set `OPENAI_API_KEY`.
 
 ## Troubleshooting
 
