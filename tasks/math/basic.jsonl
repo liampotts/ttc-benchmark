@@ -1,0 +1,15 @@
+{"id": "arith_001", "type": "numeric", "prompt": "What is (91 * 41) * 7?", "answer": 26117.0, "tol": 1e-09}
+{"id": "arith_002", "type": "numeric", "prompt": "What is (33 * 28) - 8?", "answer": 916.0, "tol": 1e-09}
+{"id": "arith_003", "type": "numeric", "prompt": "What is (51 * 32) - 5?", "answer": 1627.0, "tol": 1e-09}
+{"id": "arith_004", "type": "numeric", "prompt": "What is (25 + 34) * 8?", "answer": 472.0, "tol": 1e-09}
+{"id": "arith_005", "type": "numeric", "prompt": "What is (97 - 29) * 8?", "answer": 544.0, "tol": 1e-09}
+{"id": "arith_006", "type": "numeric", "prompt": "What is (51 * 8) + 7?", "answer": 415.0, "tol": 1e-09}
+{"id": "arith_007", "type": "numeric", "prompt": "What is (70 - 22) * 4?", "answer": 192.0, "tol": 1e-09}
+{"id": "arith_008", "type": "numeric", "prompt": "What is (89 - 36) + 11?", "answer": 64.0, "tol": 1e-09}
+{"id": "arith_009", "type": "numeric", "prompt": "What is (82 * 11) * 10?", "answer": 9020.0, "tol": 1e-09}
+{"id": "arith_010", "type": "numeric", "prompt": "What is (17 * 11) * 8?", "answer": 1496.0, "tol": 1e-09}
+{"id": "arith_011", "type": "numeric", "prompt": "What is (18 + 8) + 5?", "answer": 31.0, "tol": 1e-09}
+{"id": "arith_012", "type": "numeric", "prompt": "What is (48 * 19) * 9?", "answer": 8208.0, "tol": 1e-09}
+{"id": "div_001", "type": "numeric", "prompt": "Compute 130 / 3. Give the decimal number.", "answer": 43.333333333333336, "tol": 1e-06}
+{"id": "div_002", "type": "numeric", "prompt": "Compute 135 / 9. Give the decimal number.", "answer": 15.0, "tol": 1e-06}
+{"id": "div_003", "type": "numeric", "prompt": "Compute 196 / 6. Give the decimal number.", "answer": 32.666666666666664, "tol": 1e-06}
