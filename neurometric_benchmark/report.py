@@ -31,6 +31,7 @@ TEMPLATE = """
     <tr><th>Num Tasks</th><td>{num_tasks}</td></tr>
     <tr><th>Accuracy</th><td>{accuracy:.2%}</td></tr>
     <tr><th>Duration (s)</th><td>{duration:.1f}</td></tr>
+    <tr><th>Cost (USD)</th><td>{cost:.4f}</td></tr>
   </table>
   <h2>Details</h2>
   <table>
@@ -66,6 +67,7 @@ def render(details_path: str, summary_path: str, out_html: str):
         num_tasks=s.get('num_tasks'),
         accuracy=s.get('accuracy', 0.0),
         duration=s.get('duration_sec', 0.0),
+        cost=s.get('total_cost_usd', 0.0),
         rows='\n'.join(rows)
     )
     with open(out_html, 'w', encoding='utf-8') as f:

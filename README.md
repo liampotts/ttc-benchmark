@@ -11,7 +11,7 @@ the right tasks. Uses Ollama locally so you can run a ~1B model on your machine.
 2) Pull a small local model (choose one):
 
 ```bash
-ollama pull llama3.2:1b-instruct
+ollama pull llama3.2:1b
 # or
 ollama pull qwen2.5:1.5b-instruct
 ```
@@ -29,6 +29,12 @@ python3 -m neurometric_benchmark.main run \
 
 ```bash
 python3 -m neurometric_benchmark.main report --run-dir runs/<your_run_dir>
+```
+
+5) Generate a rich report with charts across runs:
+
+```bash
+python3 -m neurometric_benchmark.main rich_report --runs-root runs --out-dir reports
 ```
 
 Makefile shortcuts are available:
@@ -57,8 +63,9 @@ make report-latest      # render a report for the most recent run
 - Artifacts:
   - `runs/run_*/run_config.json` — configuration & environment.
   - `runs/run_*/details.jsonl` — per‑task records.
-  - `runs/run_*/summary.json` — metrics.
-  - `reports/report_*.html` — human‑readable summary.
+  - `runs/run_*/summary.json` — metrics (incl. cost & latency).
+  - `reports/report_*.html` — per‑run summary.
+  - `reports/rich_report.*` — Markdown/HTML with charts across runs.
 
 ## Requirements
 
