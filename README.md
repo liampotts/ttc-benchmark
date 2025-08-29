@@ -49,7 +49,11 @@ make report-latest      # render a report for the most recent run
 
 - Tasks:
   - `tasks/math/basic.jsonl` — numeric problems with programmatic verifier.
+  - `tasks/math/gsm8k.jsonl` — grade-school math word problems.
+  - `tasks/logic/basic.jsonl` — logic puzzles with exact answers.
+  - `tasks/code/basic.jsonl` — tiny Python functions checked by unit tests.
   - `tasks/extraction/structured.jsonl` — JSON extraction with schema validation.
+  - `tasks/extraction/messy.jsonl` — noisy real-world text (invoices, resumes, etc.).
 - Strategies:
   - `single` — single‑shot baseline.
   - `best_of_n` — sample N candidates and choose with verifier (score + tie‑break).

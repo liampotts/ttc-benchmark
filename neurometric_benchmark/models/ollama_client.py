@@ -1,9 +1,9 @@
-import json, os, subprocess, urllib.request
+import json, os, subprocess, urllib.request, time
 from typing import Dict, Any, Optional
 
 DEFAULT_BASE = os.environ.get('OLLAMA_BASE_URL', 'http://localhost:11434')
 
-def _http_generate(model: str, prompt: str, options: Optional[Dict[str, Any]] = None, json_mode: bool=False) -> Optional[str]:
+def _http_generate(model: str, prompt: str, options: Optional[Dict[str, Any]] = None, json_mode: bool=False, max_retries: int=3) -> Optional[str]:
     url = f"{DEFAULT_BASE}/api/generate"
     payload = {'model': model, 'prompt': prompt, 'stream': False}
     if options:
@@ -12,20 +12,31 @@ def _http_generate(model: str, prompt: str, options: Optional[Dict[str, Any]] = 
         payload['format'] = 'json'
     data = json.dumps(payload).encode('utf-8')
     req = urllib.request.Request(url, data=data, headers={'Content-Type':'application/json'})
-    try:
-        with urllib.request.urlopen(req, timeout=600) as resp:
-            body = resp.read().decode('utf-8')
-            obj = json.loads(body)
-            return obj.get('response')
-    except Exception:
-        return None
+    
+    for attempt in range(max_retries):
+        try:
+            with urllib.request.urlopen(req, timeout=600) as resp:
+                body = resp.read().decode('utf-8')
+                obj = json.loads(body)
+                return obj.get('response')
+        except Exception as e:
+            if attempt < max_retries - 1:
+                time.sleep(0.5 * (attempt + 1))  # Exponential backoff
+                continue
+            return None
+    return None
 
-def _cli_generate(model: str, prompt: str) -> Optional[str]:
-    try:
-        out = subprocess.check_output(['ollama', 'run', model, prompt], stderr=subprocess.STDOUT, timeout=600)
-        return out.decode('utf-8', errors='ignore')
-    except Exception:
-        return None
+def _cli_generate(model: str, prompt: str, max_retries: int=3) -> Optional[str]:
+    for attempt in range(max_retries):
+        try:
+            out = subprocess.check_output(['ollama', 'run', model, prompt], stderr=subprocess.STDOUT, timeout=600)
+            return out.decode('utf-8', errors='ignore')
+        except Exception as e:
+            if attempt < max_retries - 1:
+                time.sleep(0.5 * (attempt + 1))  # Exponential backoff
+                continue
+            return None
+    return None
 
 def generate(model: str, prompt: str, temperature: float=0.7, top_p: float=0.95, json_mode: bool=False) -> str:
     opts = {'temperature': temperature, 'top_p': top_p}
