@@ -27,6 +27,7 @@ What’s Included
 * Strategies:
     * single: single‑shot baseline
     * best_of_n: sample N candidates and choose by verifier (score + tie‑break)
+    * self_consistency: sample N candidates, normalize answers, and pick majority
 * Model adapters:
     * ollama: local via HTTP with CLI fallback
     * openai: optional stub for remote baseline (not required)
@@ -39,8 +40,9 @@ Notes
 * Pure standard library; no external deps for core features.
 * Programmatic verifiers mean you don’t need an LLM‑as‑judge locally.
 * To try a remote “big model” baseline, fill models/openai_client.py and set OPENAI_API_KEY.
+* Fallback: provide `--fallback-models` to escalate across models if the first attempt fails.
+* Tasks can specify multiple verifiers (`numeric`, `json`, `regex`) which run in sequence.
 Roadmap Ideas
-* Self‑consistency aggregator (majority vote across normalized answers).
-* Fallback policies and budget mode (optimize N under latency/token caps).
+* Budget-aware policies (optimize N under latency/token caps).
 * Richer reports (latency distributions, per‑task breakdowns, charts).
 MIT License.
