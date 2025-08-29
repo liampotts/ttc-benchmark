@@ -1,6 +1,7 @@
 import argparse, os
 from .runners import evaluate
 from .report import render
+from .rich_report import generate_report as generate_rich_report
 from .utils.logging import ensure_dir
 
 def main():
@@ -19,6 +20,11 @@ def main():
     rep = sub.add_parser('report', help='Render an HTML report for a given run dir')
     rep.add_argument('--run-dir', required=True, help='Path to a run directory containing details.jsonl and summary.json')
     rep.add_argument('--out', default=None, help='Output HTML path (defaults to reports/report_TIMESTAMP.html)')
+
+    rich = sub.add_parser('rich_report', help='Generate charts and Markdown/HTML summary across runs')
+    rich.add_argument('--runs-root', default='runs', help='Directory containing run_* subdirectories')
+    rich.add_argument('--out-dir', default='reports', help='Where to write the rich report')
+    rich.add_argument('--title', default='Neurometric TTC Benchmark Report')
 
     args = p.parse_args()
     if args.cmd == 'run':
@@ -46,6 +52,10 @@ def main():
         ensure_dir(os.path.dirname(out_html))
         render(os.path.join(run_dir, 'details.jsonl'), os.path.join(run_dir, 'summary.json'), out_html)
         print(f'Report written: {out_html}')
+
+    elif args.cmd == 'rich_report':
+        paths = generate_rich_report(args.runs_root, args.out_dir, args.title)
+        print(f"Rich report written: {paths['html']} and {paths['markdown']}")
 
 if __name__ == '__main__':
     main()

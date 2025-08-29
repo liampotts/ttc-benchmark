@@ -42,17 +42,36 @@ def build_prompt(task: Dict[str, Any]) -> str:
     else:
         return task['prompt']
 
+def _call_model(model_generate, model_name: str, prompt: str, temperature: float) -> Dict[str, Any]:
+    """Helper that normalises the output from different model backends.
+
+    Some backends (e.g., OpenAI) return extra metadata such as token counts and
+    cost. Others simply return the generated text. This function wraps the call
+    so downstream code always receives a dictionary with at least a ``text``
+    field and optional ``cost_usd``.
+    """
+    out = model_generate(model_name, prompt, temperature=temperature)
+    if isinstance(out, dict):
+        return out
+    else:
+        return {'text': out, 'cost_usd': 0.0}
+
+
 def run_single(model_generate, model_name: str, task: Dict[str, Any], temperature: float) -> Dict[str, Any]:
     prompt = build_prompt(task)
-    text = model_generate(model_name, prompt, temperature=temperature)
+    out = _call_model(model_generate, model_name, prompt, temperature)
+    text = out.get('text', '')
     ok, score, meta = normalize_answer(task, text)
-    return {'text': text, 'ok': ok, 'score': score, 'meta': meta}
+    return {'text': text, 'ok': ok, 'score': score, 'meta': meta, 'cost_usd': out.get('cost_usd', 0.0)}
 
 def run_best_of_n(model_generate, model_name: str, task: Dict[str, Any], temperature: float, n: int) -> Dict[str, Any]:
     prompt = build_prompt(task)
     cands = []
+    total_cost = 0.0
     for _ in range(n):
-        text = model_generate(model_name, prompt, temperature=temperature)
+        out = _call_model(model_generate, model_name, prompt, temperature)
+        text = out.get('text', '')
+        total_cost += out.get('cost_usd', 0.0)
         ok, score, meta = normalize_answer(task, text)
         if task.get('type') == 'numeric':
             dist = abs(meta.get('abs_error', 1e9)) if meta else 1e9
@@ -62,6 +81,7 @@ def run_best_of_n(model_generate, model_name: str, task: Dict[str, Any], tempera
     cands.sort(key=lambda x: (-x['score'], x['dist']))
     best = cands[0]
     best['all_candidates'] = cands
+    best['cost_usd'] = total_cost
     return best
 
 def evaluate(task_path: str, model_backend: str, model_name: str, strategy: str, temperature: float, n: int=1, run_root: str='runs', meta_notes: str='') -> Dict[str, Any]:
@@ -77,6 +97,7 @@ def evaluate(task_path: str, model_backend: str, model_name: str, strategy: str,
         from .models.openai_client import generate as model_generate
     else:
         raise ValueError('Unknown model backend: ' + model_backend)
+    total_cost = 0.0
     for idx, t in enumerate(tasks, 1):
         if strategy == 'single':
             out = run_single(model_generate, model_name, t, temperature)
@@ -84,6 +105,7 @@ def evaluate(task_path: str, model_backend: str, model_name: str, strategy: str,
             out = run_best_of_n(model_generate, model_name, t, temperature, n)
         else:
             raise ValueError('Unknown strategy: ' + strategy)
+        total_cost += out.get('cost_usd', 0.0)
         rec = {
             'task_id': t.get('id', f'item_{idx}'),
             'type': t.get('type'),
@@ -92,7 +114,8 @@ def evaluate(task_path: str, model_backend: str, model_name: str, strategy: str,
             'meta': out.get('meta', {}),
             'text': out.get('text', ''),
             'strategy': strategy,
-            'n': n
+            'n': n,
+            'cost_usd': out.get('cost_usd', 0.0),
         }
         results.append(rec)
         append_jsonl(details_path, rec)
@@ -108,6 +131,7 @@ def evaluate(task_path: str, model_backend: str, model_name: str, strategy: str,
         'model_backend': model_backend,
         'model_name': model_name,
         'duration_sec': end - start,
+        'total_cost_usd': total_cost,
         'meta_notes': meta_notes,
     }
     save_json(os.path.join(run_dir, 'summary.json'), summary)
