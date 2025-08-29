@@ -21,7 +21,7 @@ ollama pull qwen2.5:1.5b-instruct
 ```bash
 python3 -m neurometric_benchmark.main run \
   --task tasks/math/basic.jsonl \
-  --model ollama/llama3.2:1b-instruct \
+  --model ollama/qwen2.5:1.5b-instruct \
   --strategy best_of_n --n 5 --temperature 0.8
 ```
 
@@ -34,9 +34,7 @@ python3 -m neurometric_benchmark.main report --run-dir runs/<your_run_dir>
 Makefile shortcuts are available:
 
 ```bash
-make pull-llama         # pull llama3.2:1b-instruct
 make pull-qwen          # pull qwen2.5:1.5b-instruct
-make run-math-llama     # run math best‑of‑5 with Llama
 make run-math-qwen      # run math best‑of‑5 with Qwen
 make report-latest      # render a report for the most recent run
 ```
