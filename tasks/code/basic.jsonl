@@ -1,0 +1,2 @@
+{"id": "code_001", "type": "python", "prompt": "Write a Python function add(a, b) that returns the sum of a and b.", "fn_name": "add", "tests": [{"input": [1, 2], "output": 3}, {"input": [-5, 10], "output": 5}]}
+{"id": "code_002", "type": "python", "prompt": "Write a Python function is_palindrome(s) that returns True if s reads the same backward.", "fn_name": "is_palindrome", "tests": [{"input": ["radar"], "output": true}, {"input": ["apple"], "output": false}]}

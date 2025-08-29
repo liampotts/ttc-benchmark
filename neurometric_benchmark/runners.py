@@ -3,6 +3,7 @@ from typing import Dict, Any, List, Tuple
 from .utils.logging import ensure_dir, append_jsonl, save_json, new_run_dir
 from .verifiers.numeric import verify_numeric
 from .verifiers.json_schema import verify_json
+from .verifiers.python_code import verify_python
 
 def load_tasks(path: str) -> List[Dict[str, Any]]:
     tasks = []
@@ -20,6 +21,8 @@ def normalize_answer(task: Dict[str, Any], text: str) -> Tuple[bool, float, Dict
         return verify_numeric(text, float(task['answer']), tol=float(task.get('tol', 1e-6)))
     elif ttype == 'json':
         return verify_json(text, task['answer'], required_keys=task.get('required_keys'))
+    elif ttype == 'python':
+        return verify_python(text, task['fn_name'], task['tests'])
     else:
         ok = (text.strip() == str(task['answer']).strip())
         return ok, (1.0 if ok else 0.0), {}
@@ -38,6 +41,11 @@ def build_prompt(task: Dict[str, Any]) -> str:
             "Extract the requested fields and reply ONLY with a JSON object matching this schema.\n"
             f"Schema (keys and types): {schema_hint}\n\n"
             f"Text: {task['prompt']}\n\nJSON: "
+        )
+    elif ttype == 'python':
+        return (
+            "Write the requested Python function and reply with only the code.\n\n"
+            f"Task: {task['prompt']}\n"
         )
     else:
         return task['prompt']
