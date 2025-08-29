@@ -8,14 +8,14 @@ TEMPLATE = """
   <meta charset="utf-8">
   <title>Neurometric TTC Benchmark Report</title>
   <style>
-    body { font-family: -apple-system, BlinkMacSystemFont, Segoe UI, Roboto, Arial, sans-serif; margin: 40px; }
-    h1, h2, h3 { margin: 0.2em 0; }
-    table { border-collapse: collapse; width: 100%; margin-top: 1em; }
-    th, td { border: 1px solid #ddd; padding: 8px; text-align: left; }
-    th { background: #f7f7f7; }
-    code { background: #f2f2f2; padding: 2px 4px; border-radius: 3px; }
-    .ok { color: #0a7d00; font-weight: 600; }
-    .bad { color: #b00020; font-weight: 600; }
+    body {{ font-family: -apple-system, BlinkMacSystemFont, Segoe UI, Roboto, Arial, sans-serif; margin: 40px; }}
+    h1, h2, h3 {{ margin: 0.2em 0; }}
+    table {{ border-collapse: collapse; width: 100%; margin-top: 1em; }}
+    th, td {{ border: 1px solid #ddd; padding: 8px; text-align: left; }}
+    th {{ background: #f7f7f7; }}
+    code {{ background: #f2f2f2; padding: 2px 4px; border-radius: 3px; }}
+    .ok {{ color: #0a7d00; font-weight: 600; }}
+    .bad {{ color: #b00020; font-weight: 600; }}
   </style>
 </head>
 <body>
